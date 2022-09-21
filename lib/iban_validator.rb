@@ -3,9 +3,11 @@ require 'iban-tools'
 class IbanValidator < ActiveModel::EachValidator
   def validate_each(object, attribute, value)
     iban = IBANTools::IBAN.new(value)
-    validation_errors = iban.validation_errors
 
-    object.errors[attribute] << (options[:message] || error_string(validation_errors)) unless validation_errors.empty?
+    validation_errors = iban.validation_errors
+    return if validation_errors.empty?
+
+    object.errors.add(attribute, (options[:message] || error_string(validation_errors)))
   end
 
   private
